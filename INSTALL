@@ -1,0 +1,12 @@
+BASIC BUILD PROCEDURE
+=====================
+You must run the autogen.sh script that generates all the GNU autotools files.
+Notice that this require GNU autoconf and automake. This is done with:
+
+    $ ./autogen.sh
+
+To build the package:
+
+    $ ./configure
+    $ make
+    $ make install
