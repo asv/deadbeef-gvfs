@@ -14,7 +14,7 @@ static DB_functions_t *deadbeef = NULL;
 static DB_vfs_t plugin;
 
 static GVfs *gvfs = NULL;
-static const char *scheme_names[] = { "sftp://", "http://", NULL };
+static const char *scheme_names[] = { "smb://", "sftp://", "http://", NULL };
 
 static DB_FILE*
 ddb_gvfs_open (const char *path)
