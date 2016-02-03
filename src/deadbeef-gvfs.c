@@ -28,13 +28,14 @@ ddb_gvfs_open (const char *path)
 
   GFileInfo *info =
     g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
-                       G_FILE_QUERY_INFO_NONE, NULL, NULL);
+                       G_FILE_QUERY_INFO_NONE, NULL, &error);
 
   if (info) {
       content_type = g_strdup (g_file_info_get_content_type (info));
       g_object_unref (info);
   } else {
-      g_warning ("Fail");
+      g_warning ("Error on request file %s information: %s", path, error->message);
+      g_error_free (error);
       return NULL;
   }
 
@@ -44,6 +45,7 @@ ddb_gvfs_open (const char *path)
   if (handle == NULL)
     {
       g_warning ("Could not open %s for reading: %s", path, error->message);
+      g_error_free (error);
       return NULL;
     }
 
@@ -83,6 +85,7 @@ ddb_gvfs_read (void *ptr, size_t size, size_t nmemb, DB_FILE *stream)
   gssize bytes = g_input_stream_read (data->handle, ptr, size * nmemb, NULL, &error);
   if (bytes < 0) {
       g_warning ("ddb_gvfs_read: error: %s", error->message);
+      g_error_free (error);
       return 0;
   }
 /*   g_warning ("return from: %s", __FUNCTION__); */
@@ -124,6 +127,7 @@ ddb_gvfs_seek (DB_FILE *stream, int64_t offset, int whence)
     return 0;
 
   g_warning ("Could not seek: %s", err->message);
+  g_error_free (err);
   return -1;
 }
 
@@ -165,6 +169,7 @@ ddb_gvfs_getlength (DB_FILE *stream)
   if (info == NULL)
     {
       g_warning ("getlength(): error: %s", error->message);
+      g_error_free (error);
       return -1;
     }
 
@@ -193,7 +198,6 @@ ddb_gvfs_get_schemes (void)
 int
 ddb_gvfs_is_streaming (void)
 {
-  /* TODO: it depends on the protocol? */
   return 0;
 }
 
@@ -206,8 +210,6 @@ ddb_gvfs_is_container (const char *path)
 static int
 ddb_gvfs_start (void)
 {
-  /* Initialize the GType system first. Required by GIO. */
-  g_type_init ();
   gvfs = g_vfs_get_default ();
 
   if (!g_vfs_is_active (gvfs))
