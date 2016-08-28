@@ -18,3 +18,7 @@ src/.libs/
 *.l[ao]
 *.o
 stamp-h1
+/archlinux/pkg
+/archlinux/src
+/archlinux/*.zip
+/archlinux/*.pkg.tar.*
